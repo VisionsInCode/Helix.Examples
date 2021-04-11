@@ -6,9 +6,9 @@ name: Build and deploy images - ltsc2019
 on:
   # Triggers the workflow on push or pull request events
   push:
-    branches: [ dev ]
+    branches: [ feature/add-github-action ]
   pull_request:
-    branches: [ dev ]
+    branches: [ feature/add-github-action ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
