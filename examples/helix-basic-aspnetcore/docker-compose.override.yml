@@ -3,7 +3,7 @@ version: "2.4"
 services:
 
   dotnetsdk:
-    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-dotnetsdk:${VERSION:-latest}
+    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-dotnetsdk-${OS_VERSION}:${VERSION:-latest}
     build:
       context: ./docker/build/dotnetsdk
       args:
@@ -12,26 +12,26 @@ services:
     scale: 0
 
   solution:
-    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-solution:${VERSION:-latest}
+    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-solution-${OS_VERSION}:${VERSION:-latest}
     build:
       context: .
       args:
         BASE_IMAGE: ${SOLUTION_BASE_IMAGE}
-        BUILD_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-dotnetsdk:${VERSION:-latest}
+        BUILD_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-dotnetsdk-${OS_VERSION}:${VERSION:-latest}
         BUILD_CONFIGURATION: ${BUILD_CONFIGURATION}
     depends_on:
       - dotnetsdk
     scale: 0
   
   rendering:
-    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-rendering:${VERSION:-latest}
+    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-rendering-${OS_VERSION}:${VERSION:-latest}
     build:
       context: ./docker/build/rendering
       target: ${BUILD_CONFIGURATION}
       args:
-        DEBUG_BASE_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-dotnetsdk:${VERSION:-latest}
+        DEBUG_BASE_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-dotnetsdk-${OS_VERSION}:${VERSION:-latest}
         RELEASE_BASE_IMAGE: mcr.microsoft.com/dotnet/core/aspnet:3.1
-        SOLUTION_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-solution:${VERSION:-latest}
+        SOLUTION_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-solution-${OS_VERSION}:${VERSION:-latest}
     ports:
       - "8090:80"
     volumes:
@@ -57,14 +57,14 @@ services:
       - rendering
   
   redis:
-    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-redis:${VERSION:-latest}
+    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-redis-${OS_VERSION}:${VERSION:-latest}
     build:
       context: ./docker/build/redis
       args:
         BASE_IMAGE: ${SITECORE_DOCKER_REGISTRY}sitecore-redis:${SITECORE_VERSION}
 
   mssql:
-    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-xm1-mssql:${VERSION:-latest}
+    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-xm1-mssql-${OS_VERSION}:${VERSION:-latest}
     build:
       context: ./docker/build/mssql
       args:
@@ -82,14 +82,14 @@ services:
   # Mount our Solr data folder and use our retagged Solr image.
   # Some modules (like SXA) also require additions to the Solr image.
   solr-init:
-    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-xm1-solr-init:${VERSION:-latest}
+    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-xm1-solr-init-${OS_VERSION}:${VERSION:-latest}
     build:
       context: ./docker/build/solr-init
       args:
         BASE_IMAGE: ${SITECORE_DOCKER_REGISTRY}sitecore-xm1-solr-init:${SITECORE_VERSION}
 
   id:
-    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-id:${VERSION:-latest}
+    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-id-${OS_VERSION}:${VERSION:-latest}
     build:
       context: ./docker/build/id
       args:
@@ -100,14 +100,14 @@ services:
       SITECORE_LICENSE_LOCATION: C:\license\license.xml
 
   cd:
-    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-xm1-cd:${VERSION:-latest}
+    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-xm1-cd-${OS_VERSION}:${VERSION:-latest}
     build:
       context: ./docker/build/cd
       args:
         BASE_IMAGE: ${SITECORE_DOCKER_REGISTRY}sitecore-xm1-cd:${SITECORE_VERSION}
         HEADLESS_SERVICES_IMAGE: ${SITECORE_MODULE_REGISTRY}sitecore-headless-services-xm1-assets:${HEADLESS_SERVICES_VERSION}
         TOOLING_IMAGE: ${SITECORE_TOOLS_REGISTRY}sitecore-docker-tools-assets:${TOOLS_VERSION}
-        SOLUTION_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-solution:${VERSION:-latest}
+        SOLUTION_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-solution-${OS_VERSION}:${VERSION:-latest}
     depends_on:
       - solution
     volumes:
@@ -119,7 +119,7 @@ services:
     entrypoint: powershell -Command "& C:\tools\entrypoints\iis\Development.ps1"
 
   cm:
-    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-xm1-cm:${VERSION:-latest}
+    image: ${REGISTRY}${COMPOSE_PROJECT_NAME}-xm1-cm-${OS_VERSION}:${VERSION:-latest}
     build:
       context: ./docker/build/cm
       args:
@@ -127,7 +127,7 @@ services:
         HEADLESS_SERVICES_IMAGE: ${SITECORE_MODULE_REGISTRY}sitecore-headless-services-xm1-assets:${HEADLESS_SERVICES_VERSION}
         MANAGEMENT_SERVICES_IMAGE: ${SITECORE_MODULE_REGISTRY}sitecore-management-services-xm1-assets:${MANAGEMENT_SERVICES_VERSION}
         TOOLING_IMAGE: ${SITECORE_TOOLS_REGISTRY}sitecore-docker-tools-assets:${TOOLS_VERSION}
-        SOLUTION_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-solution:${VERSION:-latest}
+        SOLUTION_IMAGE: ${REGISTRY}${COMPOSE_PROJECT_NAME}-solution-${OS_VERSION}:${VERSION:-latest}
     depends_on:
       - solution
     volumes:
